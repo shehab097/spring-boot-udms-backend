@@ -1,6 +1,7 @@
-package com.shehab.udms;
+package com.shehab.udms.controller;
 
 
+import com.shehab.udms.model.Student;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;

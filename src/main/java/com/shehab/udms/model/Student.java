@@ -1,4 +1,4 @@
-package com.shehab.udms;
+package com.shehab.udms.model;
 
 public class Student {
     int id;
