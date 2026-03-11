@@ -1,55 +1,54 @@
 package com.shehab.udms.controller;
 
 
+import com.shehab.udms.DTO.AdminDTO;
 import com.shehab.udms.model.Admin;
 import com.shehab.udms.repo.AdminRepo;
+import com.shehab.udms.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * only admin can access admins data
+ */
+
 @RestController
+@EnableMethodSecurity
 @RequestMapping("/admin")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
     @Autowired
     private AdminRepo adminRepo;
 
+    @Autowired
+    private AdminService adminService;
+
+
     @GetMapping
-    public List<Admin> getAllTeachers(){
-        return adminRepo.findAll();
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<AdminDTO>> getAllTeachers() {
+        List<AdminDTO> admins = adminService.getAllAdminDTOs();
+        return ResponseEntity.ok(admins);
     }
 
     @GetMapping("/{username}")
-    public Admin getAdminByUsername(@PathVariable String username) {
-        return adminRepo.findByUserUsername(username)
-                .orElseThrow(() -> new RuntimeException("Admin not found"));
+    public ResponseEntity<AdminDTO> getAdminByUsername(@PathVariable String username) {
+
+        AdminDTO dto = adminService.getAdminDTO(username);
+        return ResponseEntity.ok(dto);
     }
 
     @PutMapping("/{username}")
-    public Admin updateAdmin(@PathVariable String username, @RequestBody Admin updatedAdmin) {
+    public ResponseEntity<AdminDTO> updateAdmin(@PathVariable String username, @RequestBody Admin updatedAdmin) {
 
-        Admin admin = adminRepo.findByUserUsername(username).orElseThrow(() -> new RuntimeException("Admin not found"));
-
-        // get the logged-in username from JWT
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String loggedUsername = auth.getName();
-
-        System.out.println(loggedUsername + "##########");
-
-        if (!loggedUsername.equals(username)) {
-            throw new RuntimeException("You cannot update another admins's profile");
-        }
-
-        admin.setName(updatedAdmin.getName());
-        admin.setEmail(updatedAdmin.getEmail());
-        admin.setPhone(updatedAdmin.getPhone());
-        admin.setAddress(updatedAdmin.getAddress());
-        admin.setGender(updatedAdmin.getGender());
-
-        return adminRepo.save(admin);
+        AdminDTO dto = adminService.updateAdminDTO(username, updatedAdmin);
+        return ResponseEntity.ok(dto);
     }
 
 }

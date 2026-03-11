@@ -1,10 +1,11 @@
 package com.shehab.udms.controller;
 
+import com.shehab.udms.DTO.TeacherDTO;
 import com.shehab.udms.model.Teacher;
 import com.shehab.udms.repo.TeacherRepo;
+import com.shehab.udms.service.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,40 +17,30 @@ public class TeacherController {
     @Autowired
     private TeacherRepo teacherRepo;
 
+    @Autowired
+    private TeacherService teacherService;
+
+
     @GetMapping
-    public List<Teacher> getAllTeachers(){
-        return teacherRepo.findAll();
+    public ResponseEntity<List<TeacherDTO>> getAllTeachers(){
+
+        List<TeacherDTO> teachers = teacherService.getAllTeacherDTOs();
+        return ResponseEntity.ok(teachers);
     }
 
     @GetMapping("/{username}")
-    public Teacher getTeacherByUsername(@PathVariable String username) {
-        return teacherRepo.findByUserUsername(username)
-                .orElseThrow(() -> new RuntimeException("Teacher not found"));
+    public ResponseEntity<TeacherDTO> getTeacherByUsername(@PathVariable String username) {
+
+        TeacherDTO dto = teacherService.getTeacher(username);
+        return ResponseEntity.ok(dto);
     }
 
 
     @PutMapping("/{username}")
-    public Teacher updateTeacher(@PathVariable String username, @RequestBody Teacher updatedTeacher) {
+    public ResponseEntity<TeacherDTO> updateTeacher(@PathVariable String username, @RequestBody Teacher updatedTeacher) {
 
-        Teacher teacher = teacherRepo.findByUserUsername(username).orElseThrow(() -> new RuntimeException("Teacher not found"));
-
-        // get the logged-in username from JWT
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String loggedUsername = auth.getName();
-
-        System.out.println(loggedUsername + "##########");
-
-        if (!loggedUsername.equals(username)) {
-            throw new RuntimeException("You cannot update another teacher's profile");
-        }
-
-        teacher.setName(updatedTeacher.getName());
-        teacher.setEmail(updatedTeacher.getEmail());
-        teacher.setPhone(updatedTeacher.getPhone());
-        teacher.setAddress(updatedTeacher.getAddress());
-        teacher.setGender(updatedTeacher.getGender());
-
-        return teacherRepo.save(teacher);
+        TeacherDTO dto = teacherService.updateTeacher(username, updatedTeacher);
+        return ResponseEntity.ok(dto);
     }
 
 }

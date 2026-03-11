@@ -1,11 +1,14 @@
 package com.shehab.udms.controller;
 
 
+import com.shehab.udms.DTO.StudentDTO;
 import com.shehab.udms.model.Student;
 import com.shehab.udms.model.Teacher;
 import com.shehab.udms.repo.StudentRepo;
+import com.shehab.udms.service.StudentService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.csrf.CsrfToken;
@@ -21,41 +24,30 @@ public class StudentController {
     @Autowired
     private StudentRepo studentRepo;
 
+    @Autowired
+    private StudentService studentService;
+
 
     @GetMapping
-    public List<Student> getAllTeachers(){
-        return studentRepo.findAll();
+    public ResponseEntity<List<StudentDTO>> getAllTeachers(){
+
+        List<StudentDTO> students = studentService.getAllStudents();
+        return ResponseEntity.ok(students);
     }
 
     @GetMapping("/{username}")
-    public Student getStudentByUsername(@PathVariable String username) {
-        return studentRepo.findByUserUsername(username)
-                .orElseThrow(() -> new RuntimeException("Student not found"));
+    public ResponseEntity<StudentDTO> getStudentByUsername(@PathVariable String username) {
+
+        StudentDTO dto = studentService.getStudent(username);
+        return ResponseEntity.ok(dto);
     }
 
+
+
     @PutMapping("/{username}")
-    public Student updateStudent(@PathVariable String username, @RequestBody Student updatedStudent) {
+    public ResponseEntity<StudentDTO> updateStudent(@PathVariable String username, @RequestBody Student updatedStudent) {
 
-        Student student = studentRepo.findByUserUsername(username).orElseThrow(() -> new RuntimeException("Student not found"));
-
-        // get the logged-in username from JWT
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String loggedUsername = auth.getName();
-
-        System.out.println(loggedUsername + "##########");
-
-        if (!loggedUsername.equals(username)) {
-            throw new RuntimeException("You cannot update another student's profile");
-        }
-
-        student.setStudentID(updatedStudent.getStudentID());
-        student.setName(updatedStudent.getName());
-        student.setEmail(updatedStudent.getEmail());
-        student.setPhone(updatedStudent.getPhone());
-        student.setAddress(updatedStudent.getAddress());
-        student.setDepartment(updatedStudent.getDepartment());
-        student.setGender(updatedStudent.getGender());
-
-        return studentRepo.save(student);
+        StudentDTO dto = studentService.updateStudentDTO(username,updatedStudent);
+        return ResponseEntity.ok(dto);
     }
 }
