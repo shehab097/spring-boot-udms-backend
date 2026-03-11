@@ -1,37 +1,40 @@
 package com.shehab.udms.model;
 
+import com.shehab.udms.types.Department;
+import com.shehab.udms.types.Gender;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+
+@Entity
+@NoArgsConstructor
+@Getter
+@Setter
 public class Student {
-    int id;
-    String name;
-    int marks;
 
-    public Student(int id, String name, int marks) {
-        this.id = id;
-        this.name = name;
-        this.marks = marks;
-    }
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    public int getId() {
-        return id;
-    }
+    @Column(unique = true, nullable = false)
+    private String username;
 
-    public void setId(int id) {
-        this.id = id;
-    }
+    private String studentID;
+    private String name;
+    private String email;
+    private String phone;
+    private String address;
 
-    public String getName() {
-        return name;
-    }
+    @Enumerated(EnumType.STRING)
+    private Department department;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
-    public int getMarks() {
-        return marks;
-    }
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private Users user;
 
-    public void setMarks(int marks) {
-        this.marks = marks;
-    }
 }

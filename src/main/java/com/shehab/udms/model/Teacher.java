@@ -1,31 +1,31 @@
 package com.shehab.udms.model;
 
-
-import com.shehab.udms.types.Role;
+import com.shehab.udms.types.Gender;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Entity
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString(onlyExplicitlyIncluded = true) // Prevents lazy-loading issues
-public class Users {
+public class Teacher {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true, nullable = false)
     private String username;
+    private String name;
+    private String email;
+    private String phone;
+    private String address;
 
-    @Column(nullable = false)
-    private String password;
-
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Gender gender;
 
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private Users user;
 }

@@ -1,8 +1,10 @@
 package com.shehab.udms.controller;
 
+import com.shehab.udms.DTO.UserDTO;
 import com.shehab.udms.model.Users;
 import com.shehab.udms.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,10 +22,14 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody Users user){
-        System.out.println(user);
+    public ResponseEntity<UserDTO> login(@RequestBody Users user){
 
-        // check valid user
-        return service.verify(user);
+        try {
+            UserDTO dto = service.verify(user);
+            return ResponseEntity.ok(dto);
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(401).build(); // Unauthorized
+        }
     }
 }
