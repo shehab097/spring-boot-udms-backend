@@ -3,7 +3,6 @@ package com.shehab.udms.controller;
 
 import com.shehab.udms.DTO.NoticeDTO;
 import com.shehab.udms.model.Notice;
-import com.shehab.udms.repo.NoticeRepo;
 import com.shehab.udms.service.NoticeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

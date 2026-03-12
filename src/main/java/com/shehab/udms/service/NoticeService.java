@@ -52,7 +52,7 @@ public class NoticeService {
             }
 
 
-            System.out.println(notice.getContent() +" ::: content");
+//            System.out.println(notice.getContent() +" ::: content");
 
             notice.setPostBy(loggedUsername);
             notice.setDate(LocalDateTime.now());
