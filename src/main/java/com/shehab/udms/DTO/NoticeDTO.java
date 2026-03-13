@@ -12,7 +12,7 @@ public record NoticeDTO(
         String content,
         LocalDateTime date,
         String postBy,
-        int noticeForSem,
+        Long noticeForSem,
         Department department
         ) {
 }

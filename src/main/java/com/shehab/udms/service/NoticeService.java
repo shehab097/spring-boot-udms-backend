@@ -75,7 +75,7 @@ public class NoticeService {
     }
 
     // update
-    public NoticeDTO updateNotice(int id, Notice updatedNotice) {
+    public NoticeDTO updateNotice(Long id, Notice updatedNotice) {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String loggedUsername = auth.getName();
@@ -111,11 +111,11 @@ public class NoticeService {
     }
 
     // delete
-    public void deleteNotice(int id) {
+    public void deleteNotice(Long id) {
         noticeRepo.deleteById(id);
     }
 
-    public NoticeDTO finedNotice(int id) {
+    public NoticeDTO finedNotice(Long id) {
 
         Notice notice = noticeRepo.findById(id).orElseThrow(()-> new RuntimeException("Notice not found"));
 

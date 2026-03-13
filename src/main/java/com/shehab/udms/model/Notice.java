@@ -21,7 +21,8 @@ public class Notice {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
+
+    @Column(columnDefinition = "TEXT",nullable = false)
     private String content;
 
     @Column(nullable = false)
@@ -30,7 +31,7 @@ public class Notice {
     @Column(nullable = false)
     private String postBy;
 
-    private int noticeForSem;
+    private Long noticeForSem;
 
     @Enumerated(EnumType.STRING)
     private Department department;

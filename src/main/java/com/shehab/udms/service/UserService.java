@@ -1,6 +1,7 @@
 package com.shehab.udms.service;
 
 import com.shehab.udms.DTO.UserDTO;
+import com.shehab.udms.DTO.UserInfoDTO;
 import com.shehab.udms.model.Admin;
 import com.shehab.udms.model.Student;
 import com.shehab.udms.model.Teacher;
@@ -15,6 +16,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 @Service
@@ -44,9 +47,15 @@ public class UserService {
 
     public Users register(Users user){
 
-        user.setPassword(encoder.encode(user.getPassword()));
+        Users existingUser = userRepo.findUserByUsername(user.getUsername());
 
+        if (existingUser != null) {
+            throw new RuntimeException("Username already exists");
+        }
+
+        user.setPassword(encoder.encode(user.getPassword()));
         Users savedUser = userRepo.save(user);
+
 
         // create empty profile depending on role
         switch(savedUser.getRole()){
@@ -96,6 +105,14 @@ public class UserService {
             );
         }
         throw new Exception("Invalid username or password");
+    }
+
+    public List<UserInfoDTO> findAllUsers() {
+        return userRepo.findAll().stream()
+                .map(user -> new UserInfoDTO(
+                        user.getUsername(),
+                        user.getRole()
+                )).toList();
     }
 }
 

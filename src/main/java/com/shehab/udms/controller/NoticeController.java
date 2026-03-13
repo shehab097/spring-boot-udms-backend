@@ -31,7 +31,7 @@ public class NoticeController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<NoticeDTO> postNotice(@PathVariable int id){
+    public ResponseEntity<NoticeDTO> postNotice(@PathVariable Long id){
 
         NoticeDTO dto = noticeService.finedNotice(id);
         return ResponseEntity.ok(dto);
@@ -45,7 +45,7 @@ public class NoticeController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('TEACHER')")
-    public ResponseEntity<NoticeDTO> putNotice(@PathVariable int id,@RequestBody Notice notice){
+    public ResponseEntity<NoticeDTO> putNotice(@PathVariable Long id,@RequestBody Notice notice){
 
         NoticeDTO dto = noticeService.updateNotice(id,notice);
         return ResponseEntity.ok(dto);
@@ -53,7 +53,7 @@ public class NoticeController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('TEACHER')")
-    public ResponseEntity<?> deleteNotice(@PathVariable int id){
+    public ResponseEntity<?> deleteNotice(@PathVariable Long id){
         noticeService.deleteNotice(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

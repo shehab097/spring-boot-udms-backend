@@ -29,7 +29,7 @@ public class StudentController {
 
 
     @GetMapping
-    public ResponseEntity<List<StudentDTO>> getAllTeachers(){
+    public ResponseEntity<List<StudentDTO>> getAllStudents(){
 
         List<StudentDTO> students = studentService.getAllStudents();
         return ResponseEntity.ok(students);
@@ -41,7 +41,6 @@ public class StudentController {
         StudentDTO dto = studentService.getStudent(username);
         return ResponseEntity.ok(dto);
     }
-
 
 
     @PutMapping("/{username}")
