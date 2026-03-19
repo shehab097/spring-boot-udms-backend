@@ -4,6 +4,7 @@ package com.shehab.udms.service;
 import com.shehab.udms.DTO.TeacherDTO;
 import com.shehab.udms.model.Teacher;
 import com.shehab.udms.repo.TeacherRepo;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,30 +18,8 @@ public class TeacherService {
     @Autowired
     private TeacherRepo teacherRepo;
 
-    // get teachers
-    public List<TeacherDTO> getAllTeacherDTOs() {
-        return teacherRepo.findAll().stream()
-                .map(teacher -> new TeacherDTO(
-                        teacher.getId(),
-                        teacher.getUsername(),
-                        teacher.getName(),
-                        teacher.getEmail(),
-                        teacher.getPhone(),
-                        teacher.getAddress(),
-                        teacher.getGender(),
-                        teacher.getUser().getId(),
-                        teacher.getUser().getRole()
-                ))
-                .toList();
-    }
-
-
-    // get teacher
-    public TeacherDTO getTeacher(String username){
-
-        Teacher teacher = teacherRepo.findByUserUsername(username)
-                .orElseThrow(() -> new RuntimeException("Teacher not found"));
-
+    // dto
+    private static @NonNull TeacherDTO getDto(Teacher teacher) {
         return new TeacherDTO(
                 teacher.getId(),
                 teacher.getUsername(),
@@ -52,6 +31,22 @@ public class TeacherService {
                 teacher.getUser().getId(),
                 teacher.getUser().getRole()
         );
+    }
+
+    // get teachers
+    public List<TeacherDTO> getAllTeacherDTOs() {
+        return teacherRepo.findAll().stream()
+                .map(teacher -> getDto(teacher))
+                .toList();
+    }
+
+    // get teacher
+    public TeacherDTO getTeacher(String username){
+
+        Teacher teacher = teacherRepo.findByUserUsername(username)
+                .orElseThrow(() -> new RuntimeException("Teacher not found"));
+
+        return getDto(teacher);
     }
 
 
@@ -77,16 +72,6 @@ public class TeacherService {
 
         teacherRepo.save(teacher);
 
-        return new TeacherDTO(
-                teacher.getId(),
-                teacher.getUsername(),
-                teacher.getName(),
-                teacher.getEmail(),
-                teacher.getPhone(),
-                teacher.getAddress(),
-                teacher.getGender(),
-                teacher.getUser().getId(),
-                teacher.getUser().getRole()
-        );
+        return getDto(teacher);
     }
 }

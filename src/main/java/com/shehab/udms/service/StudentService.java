@@ -3,6 +3,7 @@ package com.shehab.udms.service;
 import com.shehab.udms.DTO.StudentDTO;
 import com.shehab.udms.model.Student;
 import com.shehab.udms.repo.StudentRepo;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,31 +17,8 @@ public class StudentService {
     @Autowired
     private StudentRepo studentRepo;
 
-
-    public List<StudentDTO> getAllStudents() {
-        return studentRepo.findAll().stream()
-                .map(student -> new StudentDTO(
-                        student.getId(),
-                        student.getUsername(),
-                        student.getStudentID(),
-                        student.getName(),
-                        student.getEmail(),
-                        student.getPhone(),
-                        student.getAddress(),
-                        student.getDepartment(),
-                        student.getGender(),
-                        student.getUser().getId(),
-                        student.getUser().getRole()
-                ))
-                .toList();
-    }
-
-
-
-    public StudentDTO getStudent(String username){
-        Student student = studentRepo.findByUserUsername(username)
-                .orElseThrow(() -> new RuntimeException("Student not found"));
-
+    // dto to return
+    private static @NonNull StudentDTO getDto(Student student) {
         return new StudentDTO(
                 student.getId(),
                 student.getUsername(),
@@ -50,10 +28,28 @@ public class StudentService {
                 student.getPhone(),
                 student.getAddress(),
                 student.getDepartment(),
+                student.getCurrSemester(),
                 student.getGender(),
                 student.getUser().getId(),
                 student.getUser().getRole()
         );
+    }
+
+    public List<StudentDTO> getAllStudents() {
+        return studentRepo.findAll().stream()
+                .map(student -> getDto(student))
+                .toList();
+    }
+
+    public StudentDTO getStudent(String username){
+        Student student = studentRepo.findByUserUsername(username)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+
+        return getStudentDTO(student);
+    }
+
+    private static @NonNull StudentDTO getStudentDTO(Student student) {
+        return getDto(student);
     }
 
     // update
@@ -80,18 +76,19 @@ public class StudentService {
 
         studentRepo.save(student);
 
-        return new StudentDTO(
-                student.getId(),
-                student.getUsername(),
-                student.getStudentID(),
-                student.getName(),
-                student.getEmail(),
-                student.getPhone(),
-                student.getAddress(),
-                student.getDepartment(),
-                student.getGender(),
-                student.getUser().getId(),
-                student.getUser().getRole()
-        );
+        return getDto(student);
+
+
+    }
+
+    // update current semester (admin only)
+    public StudentDTO updateStudentsCurrSem(String username, Student updatedStudent) {
+
+        Student student = studentRepo.findByUserUsername(username).orElseThrow(() -> new RuntimeException("Student not found"));
+
+        student.setCurrSemester(updatedStudent.getCurrSemester());
+        studentRepo.save(student);
+
+        return getDto(student);
     }
 }

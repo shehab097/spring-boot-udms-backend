@@ -26,6 +26,7 @@ public class Student {
     private String email;
     private String phone;
     private String address;
+    private Integer currSemester;   // for integrating attendance system
 
     @Enumerated(EnumType.STRING)
     private Department department;

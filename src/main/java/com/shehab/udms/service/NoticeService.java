@@ -4,6 +4,7 @@ package com.shehab.udms.service;
 import com.shehab.udms.DTO.NoticeDTO;
 import com.shehab.udms.model.Notice;
 import com.shehab.udms.repo.NoticeRepo;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,19 +22,23 @@ public class NoticeService {
     private NoticeRepo noticeRepo;
 
 
+    // dto
+    private static @NonNull NoticeDTO getDto(Notice savedNotice) {
+        return new NoticeDTO(
+                savedNotice.getId(),
+                savedNotice.getTitle(),
+                savedNotice.getContent(),
+                savedNotice.getDate(),
+                savedNotice.getPostBy(),
+                savedNotice.getNoticeForSem(),
+                savedNotice.getDepartment()
+        );
+    }
 
     public List<NoticeDTO> findAllNotice(){
 
         return noticeRepo.findAll().stream()
-                .map(notice -> new NoticeDTO(
-                        notice.getId(),
-                        notice.getTitle(),
-                        notice.getContent(),
-                        notice.getDate(),
-                        notice.getPostBy(),
-                        notice.getNoticeForSem(),
-                        notice.getDepartment()
-                ))
+                .map(notice -> getDto(notice))
                 .toList();
     }
 
@@ -45,33 +50,18 @@ public class NoticeService {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String loggedUsername = auth.getName();
 
-//            System.out.println(loggedUsername + " create");
-
             if (loggedUsername == null) {
                 throw new RuntimeException("create");
             }
-
-
-//            System.out.println(notice.getContent() +" ::: content");
 
             notice.setPostBy(loggedUsername);
             notice.setDate(LocalDateTime.now());
             Notice savedNotice = noticeRepo.save(notice);
 
-            return new NoticeDTO(
-                    savedNotice.getId(),
-                    savedNotice.getTitle(),
-                    savedNotice.getContent(),
-                    savedNotice.getDate(),
-                    savedNotice.getPostBy(),
-                    savedNotice.getNoticeForSem(),
-                    savedNotice.getDepartment()
-            );
+            return getDto(savedNotice);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-
     }
 
     // update
@@ -80,12 +70,9 @@ public class NoticeService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String loggedUsername = auth.getName();
 
-//        System.out.println(loggedUsername + " update");
-
         if (loggedUsername == null) {
             throw new RuntimeException("null update");
         }
-
 
         Notice notice = noticeRepo.findById(id).orElseThrow(()-> new RuntimeException("Notice not found"));
 
@@ -97,36 +84,17 @@ public class NoticeService {
         notice.setDepartment(updatedNotice.getDepartment());
 
         noticeRepo.save(notice);
-
-        return new NoticeDTO(
-                notice.getId(),
-                notice.getTitle(),
-                notice.getContent(),
-                notice.getDate(),
-                notice.getPostBy(),
-                notice.getNoticeForSem(),
-                notice.getDepartment()
-        );
-
+        return getDto(notice);
     }
 
     // delete
     public void deleteNotice(Long id) {
         noticeRepo.deleteById(id);
     }
-
     public NoticeDTO finedNotice(Long id) {
 
         Notice notice = noticeRepo.findById(id).orElseThrow(()-> new RuntimeException("Notice not found"));
 
-        return  new NoticeDTO(
-                notice.getId(),
-                notice.getTitle(),
-                notice.getContent(),
-                notice.getDate(),
-                notice.getPostBy(),
-                notice.getNoticeForSem(),
-                notice.getDepartment()
-        );
+        return getDto(notice);
     }
 }

@@ -86,8 +86,6 @@ public class StudentEnrolledService {
                 .map(code -> courseRepo.findByCourseCode(code))
                 .toList();
 
-
-
         enroll.setStudent(student);
         enroll.setSemester(semester);
         enroll.setEnrolledCourses(courses);

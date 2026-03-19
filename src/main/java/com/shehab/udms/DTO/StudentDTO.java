@@ -14,6 +14,7 @@ public record StudentDTO(
         String phone,
         String address,
         Department department,
+        Integer currSemester,
         Gender gender,
         Long userId,    // From nested Users
         Role role       // From nested Users

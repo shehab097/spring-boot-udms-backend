@@ -3,6 +3,7 @@ package com.shehab.udms.service;
 import com.shehab.udms.DTO.CourseDTO;
 import com.shehab.udms.model.Course;
 import com.shehab.udms.repo.CourseRepo;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,27 +15,8 @@ public class CourseService {
     @Autowired
     private CourseRepo courseRepo;
 
-    // get all
-    public List<CourseDTO> getAllCourses(){
-        return courseRepo.findAll().stream()
-                .map(
-                        course -> new CourseDTO(
-                                course.getId(),
-                                course.getCourseCode(),
-                                course.getCourseName(),
-                                course.getCourseSemester(),
-                                course.getCourseCredit(),
-                                course.getCourseDepartment()
-                        )
-                ).toList();
-    }
-
-    // get course
-    public CourseDTO getCourse(int id){
-        Course course = courseRepo.findById(id).orElseThrow(() -> new RuntimeException("Course not found"));
-
-        courseRepo.save(course);
-
+    // dto
+    private static @NonNull CourseDTO getDto(Course course) {
         return new CourseDTO(
                 course.getId(),
                 course.getCourseCode(),
@@ -43,6 +25,24 @@ public class CourseService {
                 course.getCourseCredit(),
                 course.getCourseDepartment()
         );
+    }
+
+    // get all
+    public List<CourseDTO> getAllCourses(){
+        return courseRepo.findAll().stream()
+                .map(
+                        course -> getDto(course)
+                ).toList();
+    }
+
+
+    // get course
+    public CourseDTO getCourse(int id){
+        Course course = courseRepo.findById(id).orElseThrow(() -> new RuntimeException("Course not found"));
+
+        courseRepo.save(course);
+
+        return getDto(course);
     }
 
     // post
@@ -60,14 +60,7 @@ public class CourseService {
 
         Course course = courseRepo.save(newCourse);
 
-        return new CourseDTO(
-                course.getId(),
-                course.getCourseCode(),
-                course.getCourseName(),
-                course.getCourseSemester(),
-                course.getCourseCredit(),
-                course.getCourseDepartment()
-        );
+        return getDto(course);
     }
 
     // update
@@ -84,14 +77,7 @@ public class CourseService {
 
         courseRepo.save(course); // save
 
-        return new CourseDTO(
-                course.getId(),
-                course.getCourseCode(),
-                course.getCourseName(),
-                course.getCourseSemester(),
-                course.getCourseCredit(),
-                course.getCourseDepartment()
-        );
+        return getDto(course);
     }
 
     //delete

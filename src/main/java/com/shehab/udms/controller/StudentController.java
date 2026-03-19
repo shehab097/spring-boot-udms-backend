@@ -9,6 +9,8 @@ import com.shehab.udms.service.StudentService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.csrf.CsrfToken;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+@EnableMethodSecurity
 @RestController
 @RequestMapping("/student")
 public class StudentController {
@@ -49,4 +52,14 @@ public class StudentController {
         StudentDTO dto = studentService.updateStudentDTO(username,updatedStudent);
         return ResponseEntity.ok(dto);
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{username}/semester")
+    public ResponseEntity<StudentDTO> updateStudentCurrSemester(@PathVariable String username, @RequestBody Student updatedStudent) {
+
+        StudentDTO dto = studentService.updateStudentsCurrSem(username,updatedStudent);
+        return ResponseEntity.ok(dto);
+    }
+
+
 }

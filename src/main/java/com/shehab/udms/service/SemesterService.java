@@ -3,6 +3,7 @@ package com.shehab.udms.service;
 import com.shehab.udms.DTO.SemesterDTO;
 import com.shehab.udms.model.Semester;
 import com.shehab.udms.repo.SemesterRepo;
+import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,27 +18,8 @@ public class SemesterService {
     @Autowired
     private SemesterRepo semesterRepo;
 
-    // get all
-    public List<SemesterDTO> getAllSemesters(){
-        return semesterRepo.findAll().stream()
-                .map(
-                        semester -> new SemesterDTO(
-                                semester.getId(),
-                                semester.getSemesterNo(),
-                                semester.getBatch(),
-                                semester.getSession(),
-                                semester.getAddedBy(),
-                                semester.getAddedTime()
-                        )
-                ).toList();
-    }
-
-    // get semester
-    public SemesterDTO getSemester(int id){
-        Semester semester = semesterRepo.findById(id).orElseThrow(() -> new RuntimeException("Semester not found"));
-
-        semesterRepo.save(semester);
-
+    // dto
+    private static @NonNull SemesterDTO getDto(Semester semester) {
         return new SemesterDTO(
                 semester.getId(),
                 semester.getSemesterNo(),
@@ -46,6 +28,23 @@ public class SemesterService {
                 semester.getAddedBy(),
                 semester.getAddedTime()
         );
+    }
+
+    // get all
+    public List<SemesterDTO> getAllSemesters(){
+        return semesterRepo.findAll().stream()
+                .map(
+                        semester -> getDto(semester)
+                ).toList();
+    }
+
+    // get semester
+    public SemesterDTO getSemester(int id){
+
+        Semester semester = semesterRepo.findById(id).orElseThrow(() -> new RuntimeException("Semester not found"));
+
+        semesterRepo.save(semester);
+        return getDto(semester);
     }
 
     // post
@@ -63,14 +62,7 @@ public class SemesterService {
         newSemester.setAddedTime(LocalDateTime.now());
         Semester semester = semesterRepo.save(newSemester);
 
-        return new SemesterDTO(
-                semester.getId(),
-                semester.getSemesterNo(),
-                semester.getBatch(),
-                semester.getSession(),
-                semester.getAddedBy(),
-                semester.getAddedTime()
-        );
+        return getDto(semester);
     }
 
     // update
@@ -86,7 +78,6 @@ public class SemesterService {
             throw new RuntimeException("null update");
         }
 
-
         // updating
         semester.setSemesterNo(updatedSemester.getSemesterNo());
         semester.setSession(updatedSemester.getSession());
@@ -94,15 +85,7 @@ public class SemesterService {
         semester.setAddedTime(LocalDateTime.now());
 
         semesterRepo.save(semester); // save
-
-        return new SemesterDTO(
-                semester.getId(),
-                semester.getSemesterNo(),
-                semester.getBatch(),
-                semester.getSession(),
-                semester.getAddedBy(),
-                semester.getAddedTime()
-        );
+        return getDto(semester);
     }
 
     //delete
