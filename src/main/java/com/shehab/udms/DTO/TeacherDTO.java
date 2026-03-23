@@ -3,6 +3,8 @@ package com.shehab.udms.DTO;
 import com.shehab.udms.types.Gender;
 import com.shehab.udms.types.Role;
 
+import java.util.List;
+
 public record TeacherDTO(
         Long id,
         String username,
@@ -12,5 +14,6 @@ public record TeacherDTO(
         String address,
         Gender gender,
         Long userId,    // From nested Users
-        Role role       // From nested Users
+        Role role,       // From nested Users
+        List<CourseSimpleDTO> courses
 ) {}

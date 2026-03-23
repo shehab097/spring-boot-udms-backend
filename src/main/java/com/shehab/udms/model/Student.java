@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 
 @Entity
 @NoArgsConstructor
@@ -21,6 +23,7 @@ public class Student {
     @Column(unique = true, nullable = false)
     private String username;
 
+    @Column(unique = true)
     private String studentID;
     private String name;
     private String email;
@@ -34,8 +37,11 @@ public class Student {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private Users user;
+
+    @OneToMany(mappedBy = "student",fetch = FetchType.LAZY)
+    private List<Attendance> attendances;
 
 }

@@ -1,8 +1,12 @@
 package com.shehab.udms.service;
 
 
+import com.shehab.udms.DTO.CourseDTO;
+import com.shehab.udms.DTO.CourseSimpleDTO;
 import com.shehab.udms.DTO.TeacherDTO;
+import com.shehab.udms.model.Course;
 import com.shehab.udms.model.Teacher;
+import com.shehab.udms.repo.CourseRepo;
 import com.shehab.udms.repo.TeacherRepo;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +24,20 @@ public class TeacherService {
 
     // dto
     private static @NonNull TeacherDTO getDto(Teacher teacher) {
+
+        List<CourseSimpleDTO> courses =
+                teacher.getCourses() == null ? List.of() :
+                        teacher.getCourses().stream()
+                                .map(course -> new CourseSimpleDTO(
+                                        course.getId(),
+                                        course.getCourseCode(),
+                                        course.getCourseName(),
+                                        course.getCourseSemester(),
+                                        course.getCourseCredit(),
+                                        course.getCourseDepartment()
+                                ))
+                                .toList();
+
         return new TeacherDTO(
                 teacher.getId(),
                 teacher.getUsername(),
@@ -29,14 +47,15 @@ public class TeacherService {
                 teacher.getAddress(),
                 teacher.getGender(),
                 teacher.getUser().getId(),
-                teacher.getUser().getRole()
+                teacher.getUser().getRole(),
+                courses
         );
     }
 
     // get teachers
     public List<TeacherDTO> getAllTeacherDTOs() {
         return teacherRepo.findAll().stream()
-                .map(teacher -> getDto(teacher))
+                .map(TeacherService::getDto)
                 .toList();
     }
 

@@ -34,6 +34,11 @@ public class Course {
     @Enumerated(EnumType.STRING)
     private Department courseDepartment;
 
+    // adding link with teacher, a course should be associated with a teacher
+    @ManyToOne
+    @JoinColumn(name = "teacher_id")
+    private Teacher teacher;
+
 //    @Column(nullable = false)
 //    private String addedBy;
 //
