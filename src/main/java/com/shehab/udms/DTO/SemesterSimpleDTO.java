@@ -1,13 +1,11 @@
 package com.shehab.udms.DTO;
 
-
 import java.time.LocalDateTime;
 
-public record SemesterDTO(
+public record SemesterSimpleDTO(
         Long id,
         Long semesterNo,
         Long batch,
-        String session,
-        String addedBy,
-        LocalDateTime addedTime
-) {}
+        String session
+) {
+}

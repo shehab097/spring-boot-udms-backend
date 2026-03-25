@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 public class Course {
     @Id
@@ -25,7 +27,7 @@ public class Course {
     private String courseName;
 
     @Column(nullable = false)
-    private int courseSemester;
+    private Long courseSemester;
 
     @Column(nullable = false)
     private double courseCredit;
@@ -38,6 +40,12 @@ public class Course {
     @ManyToOne
     @JoinColumn(name = "teacher_id")
     private Teacher teacher;
+
+    // attendence
+    @ManyToOne
+    @JoinColumn(name = "attendance_id")
+    private Attendance attendance;
+
 
 //    @Column(nullable = false)
 //    private String addedBy;

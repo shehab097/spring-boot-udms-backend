@@ -8,8 +8,8 @@ public record CourseSimpleDTO( // will use inside teacher
         Long id,
         String courseCode,
         String courseName,
-        int courseSemester,
-        double courseCredit,
+        Long courseSemester,
+        Double courseCredit,
         Department courseDepartment
 
 ) {

@@ -12,9 +12,9 @@ public record StudentEnrolledDTO(
         String studentId,
         String name,
 
-        int sem_id,
-        int semesterNo,
-        int batch,
+        Long sem_id,
+        Long semesterNo,
+        Long batch,
         String session,
 
         List<String> courseCodes,

@@ -27,7 +27,7 @@ public class StudentEnrolledController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<StudentEnrolledDTO> getStudentEnrolled(@PathVariable int id){
+    public ResponseEntity<StudentEnrolledDTO> getStudentEnrolled(@PathVariable Long id){
         return ResponseEntity.ok(enrolledService.getStudentEnrolled(id));
     }
 
@@ -39,13 +39,13 @@ public class StudentEnrolledController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<StudentEnrolledDTO> putStudentEnrolled(@PathVariable int id, @RequestBody StudentEnrolledDTO course){
+    public ResponseEntity<StudentEnrolledDTO> putStudentEnrolled(@PathVariable Long id, @RequestBody StudentEnrolledDTO course){
         return ResponseEntity.ok(enrolledService.updateStudentEnrolled(id,course));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteStudentEnrolled(@PathVariable int id){
+    public ResponseEntity<?> deleteStudentEnrolled(@PathVariable Long id){
         enrolledService.deleteStudentEnrolled(id);
         return ResponseEntity.ok().build();
     }

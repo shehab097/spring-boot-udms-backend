@@ -6,7 +6,7 @@ public record CourseDTO(
         Long id,
         String courseCode,
         String courseName,
-        int courseSemester,
+        Long courseSemester,
         double courseCredit,
         Department courseDepartment,
 

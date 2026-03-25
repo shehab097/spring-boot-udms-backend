@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 public class Student {
 
     @Id
@@ -29,7 +31,7 @@ public class Student {
     private String email;
     private String phone;
     private String address;
-    private Integer currSemester;   // for integrating attendance system
+    private Long currSemester;   // for integrating attendance system
 
     @Enumerated(EnumType.STRING)
     private Department department;

@@ -64,7 +64,7 @@ public class StudentEnrolledService {
 
 
     // get studentEnrolled
-    public StudentEnrolledDTO getStudentEnrolled(int id){
+    public StudentEnrolledDTO getStudentEnrolled(Long id){
 
         StudentEnrolled studentEnrolled = studentEnrolledRepo.findById(id).orElseThrow(() -> new RuntimeException("studentEnrolled not found"));
         studentEnrolledRepo.save(studentEnrolled);
@@ -98,7 +98,7 @@ public class StudentEnrolledService {
 
 
     // update
-    public StudentEnrolledDTO updateStudentEnrolled(int id, StudentEnrolledDTO enrolledDTO){
+    public StudentEnrolledDTO updateStudentEnrolled(Long id, StudentEnrolledDTO enrolledDTO){
 
         StudentEnrolled enroll = studentEnrolledRepo.findById(id).orElseThrow(() -> new RuntimeException("studentEnrolled not found"));
 
@@ -122,7 +122,7 @@ public class StudentEnrolledService {
 
 
     //delete
-    public void deleteStudentEnrolled(int id) {
+    public void deleteStudentEnrolled(Long id) {
         studentEnrolledRepo.deleteById(id);
     }
 

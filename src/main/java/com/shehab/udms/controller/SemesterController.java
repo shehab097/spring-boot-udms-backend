@@ -25,7 +25,7 @@ public class SemesterController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SemesterDTO> getSemester(@PathVariable int id){
+    public ResponseEntity<SemesterDTO> getSemester(@PathVariable Long id){
         return ResponseEntity.ok(semesterService.getSemester(id));
     }
 
@@ -37,13 +37,13 @@ public class SemesterController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<SemesterDTO> putSemester(@PathVariable int id, @RequestBody Semester semester){
+    public ResponseEntity<SemesterDTO> putSemester(@PathVariable Long id, @RequestBody Semester semester){
         return ResponseEntity.ok(semesterService.updateSemester(id,semester));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteSemester(@PathVariable int id){
+    public ResponseEntity<?> deleteSemester(@PathVariable Long id){
         semesterService.deleteSemester(id);
         return ResponseEntity.ok().build();
     }

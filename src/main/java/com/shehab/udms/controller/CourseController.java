@@ -26,7 +26,7 @@ public class CourseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CourseDTO> getCourse(@PathVariable int id){
+    public ResponseEntity<CourseDTO> getCourse(@PathVariable Long id){
         return ResponseEntity.ok(courseService.getCourse(id));
     }
 
@@ -38,13 +38,13 @@ public class CourseController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<CourseDTO> putCourse(@PathVariable int id, @RequestBody Course course){
+    public ResponseEntity<CourseDTO> putCourse(@PathVariable Long id, @RequestBody Course course){
         return ResponseEntity.ok(courseService.updateCourse(id,course));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteCourse(@PathVariable int id){
+    public ResponseEntity<?> deleteCourse(@PathVariable Long id){
         courseService.deleteCourse(id);
         return ResponseEntity.ok().build();
     }

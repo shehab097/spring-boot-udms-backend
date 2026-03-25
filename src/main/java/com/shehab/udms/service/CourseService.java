@@ -56,7 +56,7 @@ public class CourseService {
 
 
     // get course
-    public CourseDTO getCourse(int id){
+    public CourseDTO getCourse(Long id){
         Course course = courseRepo.findById(id).orElseThrow(() -> new RuntimeException("Course not found"));
 
         courseRepo.save(course);
@@ -90,7 +90,7 @@ public class CourseService {
     }
 
     // update
-    public CourseDTO updateCourse(int id, Course updatedCourse){
+    public CourseDTO updateCourse(Long id, Course updatedCourse){
 
         // fetch course first
         Course course = courseRepo.findById(id)
@@ -117,7 +117,7 @@ public class CourseService {
     }
 
     //delete
-    public void deleteCourse(int id){
+    public void deleteCourse(Long id){
         courseRepo.deleteById(id);
     }
 }

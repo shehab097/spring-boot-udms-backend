@@ -39,7 +39,7 @@ public class SemesterService {
     }
 
     // get semester
-    public SemesterDTO getSemester(int id){
+    public SemesterDTO getSemester(Long id){
 
         Semester semester = semesterRepo.findById(id).orElseThrow(() -> new RuntimeException("Semester not found"));
 
@@ -66,7 +66,7 @@ public class SemesterService {
     }
 
     // update
-    public SemesterDTO updateSemester(int id, Semester updatedSemester){
+    public SemesterDTO updateSemester(Long id, Semester updatedSemester){
 
         Semester semester = semesterRepo.findById(id).orElseThrow(() -> new RuntimeException("Semester not found"));
 
@@ -89,7 +89,7 @@ public class SemesterService {
     }
 
     //delete
-    public void deleteSemester(int id){
+    public void deleteSemester(Long id){
         semesterRepo.deleteById(id);
     }
 
