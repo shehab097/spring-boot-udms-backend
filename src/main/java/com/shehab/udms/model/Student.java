@@ -31,7 +31,11 @@ public class Student {
     private String email;
     private String phone;
     private String address;
-    private Long currSemester;   // for integrating attendance system
+
+
+    @ManyToOne
+    @JoinColumn(name = "curr_semester_id")
+    private Semester currSemester;   // for integrating attendance system
 
     @Enumerated(EnumType.STRING)
     private Department department;
