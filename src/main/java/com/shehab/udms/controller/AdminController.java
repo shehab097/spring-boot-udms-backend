@@ -24,14 +24,10 @@ import java.util.List;
 public class AdminController {
 
     @Autowired
-    private AdminRepo adminRepo;
-
-    @Autowired
     private AdminService adminService;
 
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<AdminDTO>> getAllTeachers() {
         List<AdminDTO> admins = adminService.getAllAdminDTOs();
         return ResponseEntity.ok(admins);
@@ -50,5 +46,4 @@ public class AdminController {
         AdminDTO dto = adminService.updateAdminDTO(username, updatedAdmin);
         return ResponseEntity.ok(dto);
     }
-
 }

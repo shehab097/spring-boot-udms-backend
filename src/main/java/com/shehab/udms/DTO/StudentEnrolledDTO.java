@@ -8,6 +8,7 @@ import java.util.List;
  * Records are immutable and perfect for DTOs.
  */
 public record StudentEnrolledDTO(
+        Long id,
 
         String studentId,
         String name,

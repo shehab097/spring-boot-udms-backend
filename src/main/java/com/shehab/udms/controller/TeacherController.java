@@ -6,6 +6,7 @@ import com.shehab.udms.repo.TeacherRepo;
 import com.shehab.udms.service.TeacherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,13 +16,11 @@ import java.util.List;
 public class TeacherController {
 
     @Autowired
-    private TeacherRepo teacherRepo;
-
-    @Autowired
     private TeacherService teacherService;
 
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TEACHER')")
     public ResponseEntity<List<TeacherDTO>> getAllTeachers(){
 
         List<TeacherDTO> teachers = teacherService.getAllTeacherDTOs();
@@ -29,6 +28,7 @@ public class TeacherController {
     }
 
     @GetMapping("/{username}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TEACHER')")
     public ResponseEntity<TeacherDTO> getTeacherByUsername(@PathVariable String username) {
 
         TeacherDTO dto = teacherService.getTeacher(username);
@@ -37,6 +37,7 @@ public class TeacherController {
 
 
     @PutMapping("/{username}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TEACHER')")
     public ResponseEntity<TeacherDTO> updateTeacher(@PathVariable String username, @RequestBody Teacher updatedTeacher) {
 
         TeacherDTO dto = teacherService.updateTeacher(username, updatedTeacher);

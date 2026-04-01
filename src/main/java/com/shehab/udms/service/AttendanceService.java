@@ -107,6 +107,7 @@ public class AttendanceService {
     }
 
     // post
+    /**
     public AttendanceDTO postAttendance(AttendanceDTO attendanceDto) {
         System.out.println("POST");
 
@@ -137,12 +138,58 @@ public class AttendanceService {
         attendance.setCourse(course);
         attendance.setSemester(semester);
 
-        attendance.setDate(LocalDate.now());
+        attendance.setDate(attendanceDto.date()); // date received from frontend
         attendance.setStatus(attendanceDto.status());
         attendance.setMarkedAt(LocalDateTime.now());
         attendance.setUpdatedBy(loggedUsername);
 
         Attendance saved = attendanceRepo.save(attendance);
+
+        return getDto(saved);
+    }
+     **/
+
+    public AttendanceDTO postAttendance(AttendanceDTO attendanceDto) {
+        // 1. Get logged in user for audit trailing
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String loggedUsername = (auth != null) ? auth.getName() : "Anonymous";
+
+        // 2. Fetch required entities (using Record accessor syntax)
+        Student student = studentRepo.findById(attendanceDto.student().id())
+                .orElseThrow(() -> new RuntimeException("Student not found with id: " + attendanceDto.student().id()));
+
+        Course course = courseRepo.findById(attendanceDto.course().id())
+                .orElseThrow(() -> new RuntimeException("Course not found with id: " + attendanceDto.course().id()));
+
+        Semester semester = semesterRepo.findById(attendanceDto.semester().id())
+                .orElseThrow(() -> new RuntimeException("Semester not found with id: " + attendanceDto.semester().id()));
+
+        // 3. UPSERT LOGIC: Check if this record already exists in the database
+        // This uses the unique combination: Student + Course + Semester + Date
+        Attendance attendance = attendanceRepo
+                .findByStudentAndCourseAndSemesterAndDate(
+                        student,
+                        course,
+                        semester,
+                        attendanceDto.date()
+                )
+                .orElse(new Attendance()); // Create new if not found, otherwise update existing
+
+        // 4. Set/Update values
+        attendance.setStudent(student);
+        attendance.setCourse(course);
+        attendance.setSemester(semester);
+        attendance.setDate(attendanceDto.date());
+        attendance.setStatus(attendanceDto.status());
+
+        // Metadata
+        attendance.setMarkedAt(LocalDateTime.now());
+        attendance.setUpdatedBy(loggedUsername);
+
+        // 5. Save (JPA automatically knows whether to INSERT or UPDATE based on ID presence)
+        Attendance saved = attendanceRepo.save(attendance);
+
+        System.out.println(attendance.getId() == null ? "Inserted new attendance" : "Updated existing attendance");
 
         return getDto(saved);
     }

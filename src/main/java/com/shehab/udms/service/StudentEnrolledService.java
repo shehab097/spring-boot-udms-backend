@@ -42,6 +42,7 @@ public class StudentEnrolledService {
                 .toList();
 
         return new StudentEnrolledDTO(
+                enroll.getId(),
                 enroll.getStudent().getStudentID(),
                 enroll.getStudent().getName(),
                 enroll.getSemester().getId(), // sem_id

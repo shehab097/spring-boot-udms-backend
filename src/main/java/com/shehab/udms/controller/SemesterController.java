@@ -20,11 +20,13 @@ public class SemesterController {
     private SemesterService semesterService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TEACHER')")
     public ResponseEntity<List<SemesterDTO>> getAllSemesters(){
         return ResponseEntity.ok(semesterService.getAllSemesters());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TEACHER')")
     public ResponseEntity<SemesterDTO> getSemester(@PathVariable Long id){
         return ResponseEntity.ok(semesterService.getSemester(id));
     }

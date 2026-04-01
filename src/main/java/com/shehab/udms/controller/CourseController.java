@@ -21,11 +21,13 @@ public class CourseController {
     private CourseService courseService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TEACHER')")
     public ResponseEntity<List<CourseDTO>> getAllCourses(){
         return ResponseEntity.ok(courseService.getAllCourses());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TEACHER')")
     public ResponseEntity<CourseDTO> getCourse(@PathVariable Long id){
         return ResponseEntity.ok(courseService.getCourse(id));
     }

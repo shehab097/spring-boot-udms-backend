@@ -6,13 +6,16 @@ import com.shehab.udms.model.Attendance;
 import com.shehab.udms.service.AttendanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@EnableMethodSecurity
 @RequestMapping("/attendence")
+@PreAuthorize("hasRole('ADMIN') or hasRole('TEACHER')") // admin and teacher
 public class AttendanceController {
 
     @Autowired

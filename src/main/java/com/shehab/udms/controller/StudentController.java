@@ -25,9 +25,6 @@ import java.util.List;
 public class StudentController {
 
     @Autowired
-    private StudentRepo studentRepo;
-
-    @Autowired
     private StudentService studentService;
 
 
@@ -60,6 +57,4 @@ public class StudentController {
         StudentDTO dto = studentService.updateStudentsCurrSem(username,updatedStudent);
         return ResponseEntity.ok(dto);
     }
-
-
 }

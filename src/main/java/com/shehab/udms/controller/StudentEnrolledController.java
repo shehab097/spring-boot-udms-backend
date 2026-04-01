@@ -22,11 +22,13 @@ public class StudentEnrolledController {
 
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TEACHER')")
     public ResponseEntity<List<StudentEnrolledDTO>> getAllStudentEnrolls(){
         return ResponseEntity.ok(enrolledService.getAllStudentEnrolls());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TEACHER')")
     public ResponseEntity<StudentEnrolledDTO> getStudentEnrolled(@PathVariable Long id){
         return ResponseEntity.ok(enrolledService.getStudentEnrolled(id));
     }
