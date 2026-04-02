@@ -22,6 +22,8 @@ public interface AttendanceRepo extends JpaRepository<Attendance, Long> {
     // 🔍 find by date
     List<Attendance> findByDate(LocalDate date);
 
+    List<Attendance> findByCourseIdAndDate(Long courseId, LocalDate date);
+
     Optional<Attendance> findByStudentAndCourseAndSemesterAndDate(
             Student student, Course course, Semester semester, LocalDate date
     );

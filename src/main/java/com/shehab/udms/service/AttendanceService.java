@@ -152,7 +152,7 @@ public class AttendanceService {
     public AttendanceDTO postAttendance(AttendanceDTO attendanceDto) {
         // 1. Get logged in user for audit trailing
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String loggedUsername = (auth != null) ? auth.getName() : "Anonymous";
+        String loggedUsername = (auth != null) ? auth.getName() : "no data";
 
         // 2. Fetch required entities (using Record accessor syntax)
         Student student = studentRepo.findById(attendanceDto.student().id())
@@ -295,6 +295,16 @@ public class AttendanceService {
 
         return savedEntities.stream()
                 .map(AttendanceService::getDto)
+                .toList();
+    }
+
+    public List<AttendanceDTO> getTodaysAttendanceByCourse(Long courseId, LocalDate today) {
+        // ১. ডাটাবেস থেকে আজকের ওই কোর্সের সব রেকর্ড নিয়ে আসা
+        List<Attendance> attendances = attendanceRepo.findByCourseIdAndDate(courseId, today);
+
+        // ২. রেকর্ডগুলোকে DTO তে কনভার্ট করে রিটার্ন করা
+        return attendances.stream()
+                .map(AttendanceService::getDto) // আপনার অলরেডি তৈরি করা static getDto মেথড
                 .toList();
     }
 }

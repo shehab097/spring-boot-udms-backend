@@ -84,7 +84,9 @@ public class SecurityConfig {
 //        config.addAllowedOrigin("http://localhost:5173");
         config.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173",
-                "http://192.168.0.218:5173"
+                "https://localhost:5173",
+                "http://192.168.0.218:5173",
+                "https://192.168.0.218:5173" // phone
         ));
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
