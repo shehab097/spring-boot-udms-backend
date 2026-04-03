@@ -1,84 +1,115 @@
 package com.shehab.udms.service;
 
 import com.shehab.udms.DTO.AttendanceRequestDTO;
-import com.shehab.udms.model.Attendance;
-import com.shehab.udms.model.Course;
-import com.shehab.udms.model.Semester;
-import com.shehab.udms.model.Student;
-import com.shehab.udms.repo.AttendanceRepo;
-import com.shehab.udms.repo.CourseRepo;
-import com.shehab.udms.repo.SemesterRepo;
-import com.shehab.udms.repo.StudentRepo;
+import com.shehab.udms.DTO.TokenData;
+import com.shehab.udms.model.*;
+import com.shehab.udms.repo.*;
 import com.shehab.udms.types.Status;
+import com.shehab.udms.utility.QRCodeGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class AttendanceWsService {
 
+    @Autowired private QRCodeGenerator qrGenerator;
     @Autowired private AttendanceRepo attendanceRepo;
     @Autowired private StudentRepo studentRepo;
     @Autowired private CourseRepo courseRepo;
     @Autowired private SemesterRepo semesterRepo;
-    @Autowired private SimpMessagingTemplate messagingTemplate;
 
+    // Token storage (Consider using Redis for production/cluster environments)
+    private final Map<String, TokenData> tokenStorage = new ConcurrentHashMap<>();
+
+    /**
+     * Generates a QR code.
+     * Note: We use JSON format for the QR content to make it easy for the Frontend
+     * to parse and send back to the @RequestBody DTO.
+     */
+    public String generateTeacherQR(Long courseId, Long semesterId) throws Exception {
+        // Using UUID ensures uniqueness and security against guessing
+        String token = UUID.randomUUID().toString().substring(0, 8);
+
+        // Store token data with current timestamp
+        tokenStorage.put(token, new TokenData(courseId, semesterId, System.currentTimeMillis()));
+
+        // We send JSON string in QR so Frontend's JSON.parse() works perfectly
+        String qrContent = String.format(
+                "{\"courseId\":\"%d\",\"semesterId\":\"%d\",\"qrToken\":\"%s\"}",
+                courseId, semesterId, token
+        );
+
+        return qrGenerator.generateBase64QR(qrContent);
+    }
+
+    @Transactional
     public String markAttendanceByQR(AttendanceRequestDTO request, String username) {
+        // --- START DEBUGGING LOGS ---
+//        System.out.println("--- QR SCAN DEBUG ---");
+//        System.out.println("Received Token from React: '" + request.getQrToken() + "'");
+//        System.out.println("Current Tokens in Server Memory: " + tokenStorage.keySet());
+        // --- END DEBUGGING LOGS ---
 
-        // ১. স্টুডেন্ট খুঁজে বের করা (Security Context থেকে আসা ইউজারনেম দিয়ে)
+        // 0. Clean the token string just in case
+        String cleanToken = request.getQrToken() != null ? request.getQrToken().trim() : "";
+
+        // 1. Token existence check
+        TokenData cachedData = tokenStorage.get(cleanToken);
+        if (cachedData == null) {
+            return "Invalid or used QR code!";
+        }
+
+        // 2. Expiry check (60 seconds)
+        long elapsed = System.currentTimeMillis() - cachedData.getTimestamp();
+        if (elapsed > 60000) {
+            tokenStorage.remove(cleanToken);
+            return "QR Code Expired!";
+        }
+
+        // 3. Security: Data matching
+        if (!cachedData.getCourseId().equals(request.getCourseId()) ||
+                !cachedData.getSemesterId().equals(request.getSemesterId())) {
+            return "Data tampering detected!";
+        }
+
+        // 4. Fetch Entities safely
         Student student = studentRepo.findByUserUsername(username)
-                .orElseThrow(() -> new RuntimeException("Student not found for user: " + username));
+                .orElseThrow(() -> new RuntimeException("Student not found for username: " + username));
 
-        // ২. কোর্স এবং সেমিস্টার খুঁজে বের করা (DTO থেকে ID নিয়ে)
         Course course = courseRepo.findById(request.getCourseId())
-                .orElseThrow(() -> new RuntimeException("Course not found with id: " + request.getCourseId()));
+                .orElseThrow(() -> new RuntimeException("Course not found"));
 
         Semester semester = semesterRepo.findById(request.getSemesterId())
-                .orElseThrow(() -> new RuntimeException("Semester not found with id: " + request.getSemesterId()));
+                .orElseThrow(() -> new RuntimeException("Semester not found"));
 
         LocalDate today = LocalDate.now();
 
-        // ৩. অলরেডি এটেনডেন্স আছে কি না চেক করা (UPSERT লজিক)
+        // 5. Check if already marked for today
         Attendance attendance = attendanceRepo
                 .findByStudentAndCourseAndSemesterAndDate(student, course, semester, today)
                 .orElse(new Attendance());
 
-        // যদি অলরেডি প্রেজেন্ট (Status.P) থাকে
-        if (attendance.getId() != null && attendance.getStatus() == Status.P) {
-            return "Attendance already marked for today!";
-        }
-
-        // ৪. ডাটা সেট করা
+        // 6. Update/Save Attendance
         attendance.setStudent(student);
         attendance.setCourse(course);
         attendance.setSemester(semester);
         attendance.setDate(today);
-        attendance.setStatus(Status.P); // P = Present
+        attendance.setStatus(Status.P); // Present
         attendance.setMarkedAt(LocalDateTime.now());
         attendance.setUpdatedBy(username);
 
-        // ৫. ডাটাবেসে সেভ করা
         attendanceRepo.save(attendance);
 
-        // ৬. WebSocket-এর মাধ্যমে টিচারকে জানানো
-        String topic = "/topic/attendance/" + course.getId();
+        // 7. Optional: Remove token after single use
+        // tokenStorage.remove(cleanToken);
 
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("studentId", student.getStudentID());
-        payload.put("studentName", student.getName());
-        payload.put("department", student.getDepartment());
-        payload.put("status", Status.P.name());
-        payload.put("time", LocalDateTime.now().toString());
-
-        // মেসেজ ব্রডকাস্ট করা
-        messagingTemplate.convertAndSend(topic, Optional.of(payload));
-
-        return "Attendance successfully marked for: " + student.getName();
+        return "Attendance marked successfully!";
     }
 }

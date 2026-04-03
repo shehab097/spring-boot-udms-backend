@@ -8,6 +8,7 @@ import com.shehab.udms.service.AttendanceService;
 import com.shehab.udms.service.AttendanceWsService;
 import com.shehab.udms.utility.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -16,10 +17,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @EnableMethodSecurity
-@RequestMapping("/attendence")
+@RequestMapping("/attendance")
 public class AttendanceController {
 
     @Autowired private AttendanceService attendanceService;
@@ -75,25 +77,30 @@ public class AttendanceController {
     // find by date
 
     @PostMapping("/scan-qr")
+    @PreAuthorize("hasRole('STUDENT')")
     public ResponseEntity<ApiResponse> scanQRCode(@RequestBody AttendanceRequestDTO request) {
-        // SecurityContext থেকে লগইন করা স্টুডেন্টের ইউজারনেম নেওয়া হচ্ছে
+        System.out.println("ATTENDANCE:: " + getClass().getName());
+
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        // সার্ভিস কল করা
         String resultMessage = attendanceWsService.markAttendanceByQR(request, currentUsername);
 
-        return ResponseEntity.ok(new ApiResponse(resultMessage));
+
+        if (resultMessage.contains("successfully")) {
+            return ResponseEntity.ok(new ApiResponse(resultMessage));
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(resultMessage));
+        }
     }
 
-    @GetMapping("/live-status/{courseId}")
-    public ResponseEntity<List<AttendanceDTO>> getTodaysLiveAttendance(@PathVariable Long courseId) {
-        // আজকের তারিখ
-        LocalDate today = LocalDate.now();
-
-        // সার্ভিস থেকে আজকের লিস্ট নিয়ে আসা
-        // (এই মেথডটি আপনার AttendanceService-এ আগে থেকেই থাকার কথা)
-        List<AttendanceDTO> attendees = attendanceService.getTodaysAttendanceByCourse(courseId, today);
-
-        return ResponseEntity.ok(attendees);
+    @GetMapping("/generate-qr/{courseId}/{semesterId}")
+    @PreAuthorize("hasRole('TEACHER')")
+    public ResponseEntity<?> getAttendanceQR(@PathVariable Long courseId, @PathVariable Long semesterId) {
+        try {
+            String base64Image = attendanceWsService.generateTeacherQR(courseId, semesterId);
+            return ResponseEntity.ok(Map.of("qrImage", base64Image));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error generating QR");
+        }
     }
 }

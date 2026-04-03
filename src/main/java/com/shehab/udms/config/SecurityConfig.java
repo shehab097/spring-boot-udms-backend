@@ -45,7 +45,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(request ->
                         request
-                                .requestMatchers("/register","/login").permitAll()
+                                .requestMatchers("/register","/login","/ws-endpoint/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())
@@ -84,9 +84,7 @@ public class SecurityConfig {
 //        config.addAllowedOrigin("http://localhost:5173");
         config.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173",
-                "https://localhost:5173",
-                "http://192.168.0.218:5173",
-                "https://192.168.0.218:5173" // phone
+                "http://192.168.0.218:5173"
         ));
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
@@ -98,4 +96,6 @@ public class SecurityConfig {
 
         return source;
     }
+
+
 }
