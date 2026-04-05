@@ -1,6 +1,5 @@
 package com.shehab.udms.service;
 
-import com.shehab.udms.DTO.SemesterDTO;
 import com.shehab.udms.DTO.SemesterSimpleDTO;
 import com.shehab.udms.DTO.StudentDTO;
 import com.shehab.udms.model.Semester;
@@ -117,4 +116,11 @@ public class StudentService {
         return getDto(student);
     }
 
+    public List<StudentDTO> getStudentsBySemester(Long semesterId) {
+        List<Student> students = studentRepo.findByCurrSemesterId(semesterId);
+
+        return students.stream()
+                .map(StudentService::getDto) // বিদ্যমান স্ট্যাটিক মেথড ব্যবহার করা হয়েছে
+                .toList();
+    }
 }

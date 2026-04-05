@@ -74,7 +74,12 @@ public class AttendanceController {
 
     // find be semester
 
-    // find by date
+    // find by today and course
+    @GetMapping("/today/{courseId}")
+    public ResponseEntity<List<AttendanceDTO>> getTodayesAttendance(@PathVariable Long courseId){
+        return ResponseEntity.ok(attendanceService.getTodaysAttendanceByCourse(courseId, LocalDate.now()));
+    }
+
 
     @PostMapping("/scan-qr")
     @PreAuthorize("hasRole('STUDENT')")

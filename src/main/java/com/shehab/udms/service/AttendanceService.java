@@ -38,7 +38,7 @@ public class AttendanceService {
     private SemesterRepo semesterRepo;
 
     // method for dto
-    private static @NonNull AttendanceDTO getDto(Attendance attendance) {
+    static @NonNull AttendanceDTO getDto(Attendance attendance) {
 
         StudentSimpleDTO student = attendance.getStudent() == null ?
                 null :
@@ -107,48 +107,6 @@ public class AttendanceService {
     }
 
     // post
-    /**
-    public AttendanceDTO postAttendance(AttendanceDTO attendanceDto) {
-        System.out.println("POST");
-
-        Student student = studentRepo.findById(attendanceDto.student().id())
-                .orElseThrow(() -> new RuntimeException("Student not found by id"));
-
-        Course course = courseRepo.findById(attendanceDto.course().id())
-                .orElseThrow(() -> new RuntimeException("course not found by id"));
-
-        Semester semester = semesterRepo.findById(attendanceDto.semester().id())
-                .orElseThrow(() -> new RuntimeException("semester not found by id"));
-
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String loggedUsername = auth.getName();
-
-        if (loggedUsername == null) {
-            System.out.println("You cannot update another student's profile");
-        }
-
-        System.out.println(course);
-        System.out.println(student);
-        System.out.println(semester);
-
-        //
-        Attendance attendance = new Attendance();
-        attendance.setStudent(student);
-        attendance.setCourse(course);
-        attendance.setSemester(semester);
-
-        attendance.setDate(attendanceDto.date()); // date received from frontend
-        attendance.setStatus(attendanceDto.status());
-        attendance.setMarkedAt(LocalDateTime.now());
-        attendance.setUpdatedBy(loggedUsername);
-
-        Attendance saved = attendanceRepo.save(attendance);
-
-        return getDto(saved);
-    }
-     **/
-
     public AttendanceDTO postAttendance(AttendanceDTO attendanceDto) {
         // 1. Get logged in user for audit trailing
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -193,7 +151,6 @@ public class AttendanceService {
 
         return getDto(saved);
     }
-
 
     //update
     public AttendanceDTO updateAttendance(AttendanceDTO attendanceDto, Long id) {
@@ -298,13 +255,18 @@ public class AttendanceService {
                 .toList();
     }
 
+    /**
+     * Get today's attendance by course
+     * @param courseId
+     * @param today
+     * @return
+     */
     public List<AttendanceDTO> getTodaysAttendanceByCourse(Long courseId, LocalDate today) {
-        // ১. ডাটাবেস থেকে আজকের ওই কোর্সের সব রেকর্ড নিয়ে আসা
         List<Attendance> attendances = attendanceRepo.findByCourseIdAndDate(courseId, today);
 
-        // ২. রেকর্ডগুলোকে DTO তে কনভার্ট করে রিটার্ন করা
         return attendances.stream()
-                .map(AttendanceService::getDto) // আপনার অলরেডি তৈরি করা static getDto মেথড
+                .map(AttendanceService::getDto)
                 .toList();
     }
+
 }

@@ -45,7 +45,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(request ->
                         request
-                                .requestMatchers("/register","/login","/ws-endpoint/**").permitAll()
+                                .requestMatchers("/ws-attendance/**").permitAll()
+                                .requestMatchers("/register","/login").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())
@@ -76,24 +77,33 @@ public class SecurityConfig {
 
 
     // cross *
+//    @Bean
+//    public CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration config = new CorsConfiguration();
+//        config.setAllowedOrigins(Arrays.asList(
+//                "http://localhost:5173",
+//                "http://192.168.0.218:5173"
+//        ));
+//        config.addAllowedHeader("*");
+//        config.addAllowedMethod("*");
+//
+//        UrlBasedCorsConfigurationSource source =
+//                new UrlBasedCorsConfigurationSource();
+//
+//        source.registerCorsConfiguration("/**", config);
+//        return source;
+//    }
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOriginPatterns(Arrays.asList("*")); // অথবা আপনার নির্দিষ্ট IP
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        configuration.setAllowCredentials(true); //
 
-        CorsConfiguration config = new CorsConfiguration();
-
-//        config.addAllowedOrigin("http://localhost:5173");
-        config.setAllowedOrigins(Arrays.asList(
-                "http://localhost:5173",
-                "http://192.168.0.218:5173"
-        ));
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
-
-        source.registerCorsConfiguration("/**", config);
-
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 

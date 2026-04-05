@@ -3,20 +3,13 @@ package com.shehab.udms.controller;
 
 import com.shehab.udms.DTO.StudentDTO;
 import com.shehab.udms.model.Student;
-import com.shehab.udms.model.Teacher;
-import com.shehab.udms.repo.StudentRepo;
 import com.shehab.udms.service.StudentService;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @EnableMethodSecurity
@@ -42,6 +35,17 @@ public class StudentController {
         return ResponseEntity.ok(dto);
     }
 
+    /**
+     * Filter students by semester
+     * @param semesterId
+     * @return
+     */
+    @GetMapping("/semester/{semesterId}")
+    public ResponseEntity<List<StudentDTO>> getStudentsBySemesterId(@PathVariable Long semesterId) {
+
+        List<StudentDTO> students = studentService.getStudentsBySemester(semesterId);
+        return ResponseEntity.ok(students);
+    }
 
     @PutMapping("/{username}")
     public ResponseEntity<StudentDTO> updateStudent(@PathVariable String username, @RequestBody Student updatedStudent) {
