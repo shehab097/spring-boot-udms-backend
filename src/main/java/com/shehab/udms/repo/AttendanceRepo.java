@@ -29,4 +29,7 @@ public interface AttendanceRepo extends JpaRepository<Attendance, Long> {
     );
 
 
+    List<Attendance> findByStudentIdAndCourseId(Long userId, Long courseId);
+
+    List<Attendance> findByStudentId(Long userId);
 }

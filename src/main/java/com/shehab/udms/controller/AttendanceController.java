@@ -3,6 +3,7 @@ package com.shehab.udms.controller;
 
 import com.shehab.udms.DTO.AttendanceDTO;
 import com.shehab.udms.DTO.AttendanceRequestDTO;
+import com.shehab.udms.DTO.AttendanceTinyDto;
 import com.shehab.udms.model.Attendance;
 import com.shehab.udms.service.AttendanceService;
 import com.shehab.udms.service.AttendanceWsService;
@@ -107,5 +108,17 @@ public class AttendanceController {
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error generating QR");
         }
+    }
+
+    // attandancee
+    @PreAuthorize("hasRole('ADMIN') or hasRole('TEACHER')") // admin and teacher
+    @GetMapping("/attendance-data/{userId}/{courseId}")
+    public ResponseEntity<List<AttendanceTinyDto>> getUserByIdAndCourseId(@PathVariable Long userId, @PathVariable Long courseId ){
+        return ResponseEntity.ok(attendanceService.getUserByIdAndCourseId(userId, courseId));
+    }
+
+    @GetMapping("/attendance-data/{userId}")
+    public ResponseEntity<List<AttendanceTinyDto>> getUserByIdAndCourseId(@PathVariable Long userId ){
+        return ResponseEntity.ok(attendanceService.getUserById(userId));
     }
 }

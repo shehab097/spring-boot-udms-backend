@@ -1,9 +1,6 @@
 package com.shehab.udms.service;
 
-import com.shehab.udms.DTO.AttendanceDTO;
-import com.shehab.udms.DTO.CourseSimpleDTO;
-import com.shehab.udms.DTO.SemesterSimpleDTO;
-import com.shehab.udms.DTO.StudentSimpleDTO;
+import com.shehab.udms.DTO.*;
 import com.shehab.udms.model.Attendance;
 import com.shehab.udms.model.Course;
 import com.shehab.udms.model.Semester;
@@ -80,6 +77,23 @@ public class AttendanceService {
                 attendance.getStatus(),
                 attendance.getMarkedAt(),
                 attendance.getUpdatedBy()
+        );
+    }
+
+    static @NonNull AttendanceTinyDto getTinyDto(Attendance attendance){
+
+        SemesterSimpleDTO currSemester = new SemesterSimpleDTO(
+                attendance.getSemester().getId(),
+                attendance.getSemester().getSemesterNo(),
+                attendance.getSemester().getBatch(),
+                attendance.getSemester().getSession()
+        );
+
+        return new AttendanceTinyDto(
+                attendance.getCourse().getCourseName(),
+                attendance.getCourse().getCourseCode(),
+                attendance.getStatus(),
+                currSemester
         );
     }
 
@@ -269,4 +283,24 @@ public class AttendanceService {
                 .toList();
     }
 
+
+    // find by course, student
+    public List<AttendanceTinyDto> getUserByIdAndCourseId(Long userId, Long courseId) {
+
+        List<Attendance> attendances = attendanceRepo
+                .findByStudentIdAndCourseId(userId, courseId);
+
+        return attendances.stream()
+                .map(AttendanceService::getTinyDto)
+                .toList();
+    }
+
+    public List<AttendanceTinyDto> getUserById(Long userId) {
+        List<Attendance> attendances = attendanceRepo
+                .findByStudentId(userId);
+
+        return attendances.stream()
+                .map(AttendanceService::getTinyDto)
+                .toList();
+    }
 }

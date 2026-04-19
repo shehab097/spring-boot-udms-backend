@@ -2,6 +2,7 @@ package com.shehab.udms.controller;
 
 
 import com.shehab.udms.DTO.StudentDTO;
+import com.shehab.udms.DTO.StudentTinyDto;
 import com.shehab.udms.model.Student;
 import com.shehab.udms.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,5 +61,16 @@ public class StudentController {
 
         StudentDTO dto = studentService.updateStudentsCurrSem(username,updatedStudent);
         return ResponseEntity.ok(dto);
+    }
+
+    /**
+     * Attendance and course id - problem onno batch er data aste pare ki na?
+     *
+     * @param courseId
+     * @return
+     */
+    @GetMapping("/attendances/{courseId}")
+    public ResponseEntity<List<StudentTinyDto>> getAttendanceByCourseId(@PathVariable Long courseId){
+        return ResponseEntity.ok(studentService.getStudentByCourseId(courseId));
     }
 }

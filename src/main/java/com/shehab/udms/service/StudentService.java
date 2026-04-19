@@ -1,9 +1,13 @@
 package com.shehab.udms.service;
 
+import com.shehab.udms.DTO.AttendanceTinyDto;
 import com.shehab.udms.DTO.SemesterSimpleDTO;
 import com.shehab.udms.DTO.StudentDTO;
+import com.shehab.udms.DTO.StudentTinyDto;
+import com.shehab.udms.model.Attendance;
 import com.shehab.udms.model.Semester;
 import com.shehab.udms.model.Student;
+import com.shehab.udms.repo.AttendanceRepo;
 import com.shehab.udms.repo.SemesterRepo;
 import com.shehab.udms.repo.StudentRepo;
 import org.jspecify.annotations.NonNull;
@@ -14,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class StudentService {
@@ -23,6 +29,9 @@ public class StudentService {
 
     @Autowired
     private SemesterRepo semesterRepo;
+
+    @Autowired
+    private AttendanceRepo attendanceRepo;
 
     // dto to return
     private static @NonNull StudentDTO getDto(Student student) {
@@ -121,6 +130,54 @@ public class StudentService {
 
         return students.stream()
                 .map(StudentService::getDto) // বিদ্যমান স্ট্যাটিক মেথড ব্যবহার করা হয়েছে
+                .toList();
+    }
+
+    public List<StudentTinyDto> getStudentByCourseId(Long courseId) {
+
+        List<Attendance> attendances = attendanceRepo.findByCourseId(courseId);
+
+        // group by student
+        Map<Student, List<Attendance>> grouped = attendances.stream()
+                .collect(Collectors.groupingBy(Attendance::getStudent));
+
+        // convert to DTO
+        return grouped.entrySet().stream()
+                .map(entry -> {
+
+                    Student student = entry.getKey();
+                    List<Attendance> studentAttendances = entry.getValue();
+
+                    /**
+                     * hope everything will be fine
+                     */
+                    //
+                    SemesterSimpleDTO currSemester = student.getCurrSemester() == null ? null :
+                            new SemesterSimpleDTO(
+                                    student.getCurrSemester().getId(),
+                                    student.getCurrSemester().getSemesterNo(),
+                                    student.getCurrSemester().getBatch(),
+                                    student.getCurrSemester().getSession()
+                            );
+                    //
+
+                    List<AttendanceTinyDto> attendanceList = studentAttendances.stream()
+                            .map(att -> new AttendanceTinyDto(
+                                    att.getCourse().getCourseName(),
+                                    att.getCourse().getCourseCode(),
+                                    att.getStatus(),
+                                    currSemester
+
+                            ))
+                            .toList();
+
+                    return new StudentTinyDto(
+                            student.getName(),
+                            student.getStudentID(),
+                            attendanceList,
+                            (long) attendanceList.size()
+                    );
+                })
                 .toList();
     }
 }
